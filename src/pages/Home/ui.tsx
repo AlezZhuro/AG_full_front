@@ -1,4 +1,4 @@
-import { AddTask } from '@/features/addTask';
+import { AddTaskButton } from '@/features/addTask';
 import TaskList from '@/widgets/taskList/ui';
 
 export const HomePage = () => {
@@ -6,7 +6,7 @@ export const HomePage = () => {
     <>
       <div>Home</div>
       <TaskList />
-      <AddTask />
+      <AddTaskButton />
     </>
   );
 };

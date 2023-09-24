@@ -4,13 +4,16 @@ import { Meta } from '@/shared/api/meta';
 import { showToast } from '@/shared/ui/toast';
 
 export interface StoreList<T> {
-  count: number;
+  count?: number;
   items: T[];
 }
 
 export abstract class EntityStore<T> {
   public _meta: Meta = Meta.INITIAL;
-  public _list: null | StoreList<T> = null;
+  public _list: StoreList<T> = {
+    count: 0,
+    items: [],
+  };
   public _openedItem: null | T = null;
 
   constructor(public _api: unknown | null = null) {
@@ -55,5 +58,16 @@ export abstract class EntityStore<T> {
     toastMsg = message;
 
     showToast({title: toastMsg, status: 'error'})
+  }
+
+  addOne(item: T) {
+    const store = this._list;
+    store.count += 1;
+    store.items.unshift(item);
+    this._list = store;
+  }
+
+  clearOpenedItem() {
+    this._openedItem = null
   }
 }

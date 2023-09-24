@@ -1,71 +1,64 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { taskStore } from '@/entities/task';
 import { observer } from 'mobx-react-lite';
-import {
-  Card,
-  CardBody,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  VStack,
-  Text,
-  CardHeader,
-  Heading,
-  Accordion,
-  AccordionItem,
-  AccordionPanel,
-  AccordionButton,
-  AccordionIcon,
-} from '@chakra-ui/react';
+import { Box, Heading, VStack } from '@chakra-ui/react';
 import { Meta } from '@/shared/api/meta';
+import { ListSkeleton } from '../listSkeleton';
+import { EntitiesGrid } from '../entitiesGrid';
+import { AppModal, IAppModal } from '@/shared/ui/modal';
+import { EditableForm } from '../editableForm';
+import { SubtaskList } from '../subtaskList';
 
 export const TaskList = observer(() => {
   const requestStatus = taskStore.meta;
+
+  const modalRef = useRef<IAppModal | null>(null);
+  const addTaskHandler = () => modalRef?.current?.onOpen();
+  const closeModal = () => {
+    modalRef?.current?.onClose();
+    taskStore.clearOpenedItem();
+  };
 
   useEffect(() => {
     taskStore.fetchList();
   }, []);
 
-  return (
-    <VStack marginX={{ base: '10px', md: '20px' }}>
-      {requestStatus === Meta.LOADING && (
-        <Stack alignContent={'center'} justifyContent={'center'} w={'100%'}>
-          <Skeleton height="20px" />
-          <Skeleton height="20px" />
-          <Skeleton height="20px" />
-        </Stack>
-      )}
+  useEffect(() => {
+    taskStore.openedItem && addTaskHandler();
+  }, [taskStore.openedItem]);
 
-      {requestStatus === Meta.SUCCESS && <TaskGrid />}
-    </VStack>
+  const onShowMoreTask = useCallback(async (taskID: number) => {
+    await taskStore.loadOneTask(taskID);
+  }, []);
+
+  const onUpdateTask = useCallback(() => {}, []);
+
+  return (
+    <>
+      <AppModal
+        ref={modalRef}
+        modalBody={
+          <EditableForm
+            onCancel={closeModal}
+            onSave={onUpdateTask}
+            item={taskStore.openedItem}
+          >
+            {!!taskStore.openedItem?.subtasks?.length && <SubtaskList />}
+          </EditableForm>
+        }
+      />
+      <VStack paddingX={{ base: '10px', md: '20px' }} w={'100%'}>
+        {requestStatus === Meta.LOADING && <ListSkeleton />}
+
+        {requestStatus === Meta.SUCCESS && (
+          <EntitiesGrid
+            list={taskStore.list.items}
+            onShowMoreCallback={onShowMoreTask}
+          />
+        )}
+      </VStack>
+    </>
   );
 });
 
 export default TaskList;
-
-export const TaskGrid = () => {
-  return (
-    <SimpleGrid minChildWidth="300px" spacing="40px">
-      <Accordion allowToggle>
-        <Card>
-          <AccordionItem>
-            <CardHeader>
-              <Heading size="sm">#1</Heading>
-              <AccordionButton px={0} py={1} justifyContent={'space-between'}>
-                <Heading size="md">Client Report</Heading>
-                <AccordionIcon />
-              </AccordionButton>
-            </CardHeader>
-            <AccordionPanel p={0}>
-              <CardBody w={'300px'}>
-                <Text>
-                  View a summary of all your customers over the last month.
-                </Text>
-              </CardBody>
-            </AccordionPanel>
-          </AccordionItem>
-        </Card>
-      </Accordion>
-    </SimpleGrid>
-  );
-};
