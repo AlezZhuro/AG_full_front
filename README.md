@@ -5,6 +5,7 @@
 To get the frontend running locally:
 
 Clone this repo
+Setup settings inside .env file (copy from .env.example)
 yarn install to install all the dependencies defined in a package.json file.
 yarn dev to start Vite dev server.
 
