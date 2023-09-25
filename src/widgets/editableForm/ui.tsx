@@ -1,4 +1,5 @@
 import { TaskEntity } from '@/entities/task/model/type';
+import { AddSubtask } from '@/features/addSubtask';
 import { NewTaskObjectDTO } from '@/shared/api/models';
 import { Bool } from '@/shared/lib';
 import {
@@ -60,7 +61,7 @@ const EditableForm = ({
         w={'100%'}
       >
         {item?.id && <Heading size="sm">#{item.id}</Heading>}
-        {!item && <Heading mb={'20px'}>Create task</Heading>}
+        {!item && <Heading mb={'20px'}>Create</Heading>}
 
         <FormControl isInvalid={!!formik.errors.title}>
           <FormLabel htmlFor="title">Title</FormLabel>
@@ -107,8 +108,20 @@ const EditableForm = ({
           </FormControl>
         )}
 
-        {children}
-        
+        {!!children && (
+          <>
+            <HStack mt={'20px'} justify={'space-between'} alignItems={'center'}>
+              <Heading size={'sm'} >
+                Subtasks
+              </Heading>
+
+              <AddSubtask />
+            </HStack>
+
+            {children}
+          </>
+        )}
+
         <ButtonGroup
           variant="outline"
           spacing="6"
@@ -127,10 +140,7 @@ const EditableForm = ({
             </Button>
           }
           <HStack>
-            <Button
-              onClick={onCancel}
-              colorScheme="red"
-            >
+            <Button onClick={onCancel} colorScheme="red">
               Cancel
             </Button>
             <Button

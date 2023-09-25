@@ -57,17 +57,19 @@ export abstract class EntityStore<T> {
     }
     toastMsg = message;
 
-    showToast({title: toastMsg, status: 'error'})
+    showToast({ title: toastMsg, status: 'error' });
   }
 
   addOne(item: T) {
     const store = this._list;
-    store.count += 1;
+    if (store.count) {
+      store.count += 1;
+    }
     store.items.unshift(item);
     this._list = store;
   }
 
   clearOpenedItem() {
-    this._openedItem = null
+    this._openedItem = null;
   }
 }

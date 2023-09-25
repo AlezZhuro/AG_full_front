@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { taskStore } from '@/entities/task';
 import { observer } from 'mobx-react-lite';
-import { Box, Heading, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { Meta } from '@/shared/api/meta';
 import { ListSkeleton } from '../listSkeleton';
 import { EntitiesGrid } from '../entitiesGrid';
 import { AppModal, IAppModal } from '@/shared/ui/modal';
 import { EditableForm } from '../editableForm';
 import { SubtaskList } from '../subtaskList';
+import { subtaskStore } from '@/entities/subtask';
 
 export const TaskList = observer(() => {
   const requestStatus = taskStore.meta;

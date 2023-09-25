@@ -1,28 +1,34 @@
+import { useCallback, useRef } from 'react';
+import { observer } from 'mobx-react-lite';
+import { Box, Button, HStack, Heading } from '@chakra-ui/react';
+
 import { taskStore } from '@/entities/task';
+import { subtaskStore } from '@/entities/subtask';
+
 import { AppModal, IAppModal } from '@/shared/ui/modal';
-import { Box, Heading } from '@chakra-ui/react';
-import React, { useCallback, useRef } from 'react';
 import { EditableForm } from '../editableForm';
 import { EntitiesGrid } from '../entitiesGrid';
 
-const SubtaskList = () => {
+import { NewTaskObjectDTO } from '@/shared/api/models';
+
+
+const SubtaskList = observer(() => {
   const modalRef = useRef<IAppModal | null>(null);
-  const updateSubtaskHandler = () => {
+  const updateSubtaskHandler = (values: NewTaskObjectDTO) => {
     // fetch api for update subtask
   };
   const closeModal = () => {
     modalRef?.current?.onClose();
-    // taskStore.clearOpenedItem();
+    subtaskStore.clearOpenedItem();
   };
 
-  const onShowMoreSubtask = useCallback(async (taskID: number) => {
+  const onShowMoreSubtask = useCallback(async (id: number) => {
+    await subtaskStore.loadOneSubtask(id);
     modalRef.current?.onOpen();
-    // await taskStore.loadOne(taskID);
   }, []);
 
   return (
-    <Box w={'100%'} mt={10}>
-      <Heading size={'sm'}>Subtasks</Heading>
+    <Box w={'100%'} mt={5} maxH={'400px'} overflow={'scroll'} paddingInline={'10px'}>
       <EntitiesGrid
         list={taskStore.openedItem?.subtasks}
         onShowMoreCallback={onShowMoreSubtask}
@@ -33,12 +39,12 @@ const SubtaskList = () => {
           <EditableForm
             onCancel={closeModal}
             onSave={updateSubtaskHandler}
-            item={taskStore.openedItem}
+            item={subtaskStore.openedItem}
           />
         }
       />
     </Box>
   );
-};
+});
 
 export default SubtaskList;
